@@ -21,47 +21,56 @@
 %               2-pool-plsd SL: Roelloffs et al. NBM 
 clear all
 %% SETUP
- 
-%pool system parameters
-%water pool A
-P.R1A=1/3;          % [s^-1] 
-P.R2A=2;            % [s^-1]
-P.dwA=0; %deltaW_A in [ppm] 
+clearvars P Pref Pstart
+clc
+% setup pool system parameters
+%water pool 'a'
+P.R1A=1/3;              % longitudinal relaxation rate 1/T1 of pool a  [s^-1]
+P.R2A=10;                % transversal relaxation rate 1/T2 of pool a  [s^-1]
+P.dwA=0;                % chemical shift of the water pool in [ppm]
 
-%pool B
-P.fB=0.001;         % proton fraction
-P.kBA=200;          % [s^-1]
-P.dwB=1.9;          % deltaW_B in [ppm} (chemical shift)
-P.R2B=30;           % [s^-1]
-P.R1B=1;            % [s^-1]
+% CEST pool 'b'
+P.fB=0.0018018;         % proton fraction fB=M0B/M0A, e.g. 50mM creatine in water:  4*50/(2*55.5*1000)=0.0018018;
+P.kBA=50;               % exchange rate [s^-1]     % corresponds to creatine at ~ 22°C, pH=6.4 in PBS (Goerke et al.)
+P.dwB=1.9;              % chemical shift of the CEST pool in [ppm]
+P.R2B=30;               % transversal relaxation rate 1/T2 of pool b  [s^-1]
+P.R1B=1;                % longitudinal relaxation rate 1/T1 of pool b  [s^-1]
+
 % sequence parameters
-P.Zi=1;             % Z initial, in units of thermal M0, Hyperpol.: 10^4                  
-P.FREQ=300;         % [MHz]  I use ppm and µT, therefore gamma=267.5153;
-P.B1=1;             % [µT]
+P.Zi=1;                 % Z initial, in units of thermal M0, Hyperpol.: 10^4                  
+P.FREQ=300;             % [MHz]  I use ppm and µT, therefore gamma=267.5153;
+P.B1=1;                 % [µT]
 
-P.tp=0.1;           % pulse duration [s]
-P.n=100;            % pulse number 
-P.DC=0.2;           % duty cycle :  saturation time = n * P.tp/DC
+P.tp=0.1;               % pulse duration [s]
+P.n=100;                % pulse number 
+P.DC=0.5;               % duty cycle :  saturation time = n * P.tp/DC
+                        % DC yields interpulse delay td=P.tp*(1/P.DC-1)
 
 P.xZspec= [-5:0.05:5]; % deltaomega [ppm]
 
 Pstart=P;
 
-figure(1), plot(P.xZspec,Z_plsd_2pool(P),'.-') ;   hold on;
+figure(1), plot(P.xZspec,Z_pSL(P),'.-') ;   hold on;
 set(gca,'XDir','reverse'); xlabel('\Delta\omega [ppm]'); ylabel('Z(\Delta\omega)');
-text(min(P.xZspec)/3,0.5,evalc('P'),'FontSize',8)
+text(0,0,evalc('P'),'FontSize',8)
+
+% PLOT CEST:  Z_cw(Pref)-Z_cw(P) with reference struct Pref.
+Pref=P;    
+Pref.fB=0;                  % reference: Z of system without CEST pool
+%Pref.xZspec=-P.xZspec;     % reference: Z of opposite frequency
+plot(P.xZspec,Z_pSL(Pref)-Z_pSL(P),'r.-') ;   hold on; legend({'Z','Z_{ref}-Z'})
 
 %% vary a parameter
-vary=[ 0.5 1 2 4]; % define value range for variation
+vary=[ 0.1:0.1:1]; % define value range for variation
 
 for ii=1:numel(vary)
     P=Pstart; % reset previous changes
-P.B1=vary(ii); % define which parameter you want to vary
+P.DC=vary(ii); % define which parameter you want to vary
     
-figure(2), plot(P.xZspec,Z_plsd_2pool(P),'.-','Color',cl(ii,numel(vary))) ;   hold on;
+figure(2), plot(P.xZspec,Z_pSL(P),'.-','Color',cl(ii,numel(vary))) ;   hold on;
 
 Pref=P;    Pref.fB=0; %Pref.xZspec=-P.xZspec; %
-plot(P.xZspec,Z_plsd_2pool(Pref)-Z_plsd_2pool(P),'.-','Color',cl(ii,numel(vary))) ;   hold on;
+plot(P.xZspec,Z_pSL(Pref)-Z_pSL(P),'.-','Color',cl(ii,numel(vary))) ;   hold on;
 % plot(P.xZspec,(P.R1A+P.fC*P.R1C)*(1./Z_cw_2pool(P)-1./Z_cw_2pool(Pref)),'g.-') ;   hold on;
 
 end;
