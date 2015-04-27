@@ -6,7 +6,10 @@
 %   Date: 2014/08/01 
 %   Version for CEST-sources.de
 %   Author: Moritz Zaiss  - m.zaiss@dkfz.de
-%   CEST sources  Copyright (C) 2014  Moritz Zaiss
+%   Divison of Medical Physics in Radiology
+%   German Cancer Research Center (DKFZ), Heidelberg Germany, http://www.dkfz.de/en/index.html
+%   CEST sources - Copyright (C) 2014  Moritz Zaiss
+
 %   **********************************
 %   This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
 %     the Free Software Foundation, either version 3 of the License, or(at your option) any later version.
@@ -35,10 +38,10 @@ Pz=1;    % for SL           Pz=cos(theta);    % for cw   ;
 Pzeff=1; % for SL           Pzeff=cos(theta); % for cw   ; 
 
 %% pulsed formula 
-if P.n<2 P.td=0; else P.td=P.tp*(1/P.DC-1); end; % calc td
+if P.n<2 P.td=0; else P.td=P.tp.*(1./P.DC-1); end; % calc td
 
-Psi = (P.fB-Rex./P.kBA);          %S.Rex ist negativ
-        p   = exp(-R1rho*P.tp);                     %S.Rho ist negativ
+Psi = (P.fB-Rex./P.kBA);          
+        p   = exp(-R1rho.*P.tp);                     
         r1a = P.R1A+P.fB*P.kBA;
         r1b = P.R1B+P.kBA;
         a   = 1/2*(r1b+r1a+sqrt((r1b-r1a)^2+4*P.fB*P.kBA.^2));

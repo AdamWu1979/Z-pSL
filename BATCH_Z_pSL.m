@@ -2,7 +2,9 @@
 %   Date: 2014/08/01 
 %   Version for CEST-sources.de
 %   Author: Moritz Zaiss  - m.zaiss@dkfz.de
-%   CEST sources  Copyright (C) 2014  Moritz Zaiss
+%   Divison of Medical Physics in Radiology
+%   German Cancer Research Center (DKFZ), Heidelberg Germany, http://www.dkfz.de/en/index.html
+%   CEST sources - Copyright (C) 2014  Moritz Zaiss
 %   **********************************
 %   This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
 %     the Free Software Foundation, either version 3 of the License, or(at your option) any later version.
@@ -16,16 +18,16 @@
 %   Z_cw_2pool(P) calculates the Z-spectrum and returns it as a vector.
 %
 %   --references--:
-%               2-pool-cw:      Zaiss et al. JCP, Zaiss and Bachert NBM      
-%               3-pool-cw:      Zaiss et al. NBM    
-%               2-pool-plsd SL: Roelloffs et al. NBM 
+%   2-pool-cw:      Zaiss and Bachert. NBM 2013;26(5):507–18. doi:10.1002/nbm.2887   and Zaiss et al JCP 2012;136:144106. doi:10.1063/1.3701178     
+%   3-pool-cw:      Zaiss et al. NBM 2015 Feb;28(2):217-30. doi: 10.1002/nbm.3237.   
+%   2-pool-pulsd SL: Roeloffs et al. NBM 2014; 28, 40–53, doi: 10.1002/nbm.3192. 
 clear all
 %% SETUP
 clearvars P Pref Pstart
 clc
 % setup pool system parameters
 %water pool 'a'
-P.R1A=1/3;              % longitudinal relaxation rate 1/T1 of pool a  [s^-1]
+P.R1A=1;              % longitudinal relaxation rate 1/T1 of pool a  [s^-1]
 P.R2A=10;                % transversal relaxation rate 1/T2 of pool a  [s^-1]
 P.dwA=0;                % chemical shift of the water pool in [ppm]
 
@@ -43,7 +45,7 @@ P.B1=1;                 % [µT]
 
 P.tp=0.1;               % pulse duration [s]
 P.n=100;                % pulse number 
-P.DC=0.5;               % duty cycle :  saturation time = n * P.tp/DC
+P.DC=0.2;               % duty cycle :  saturation time = n * P.tp/DC
                         % DC yields interpulse delay td=P.tp*(1/P.DC-1)
 
 P.xZspec= [-5:0.05:5]; % deltaomega [ppm]
@@ -71,7 +73,6 @@ figure(2), plot(P.xZspec,Z_pSL(P),'.-','Color',cl(ii,numel(vary))) ;   hold on;
 
 Pref=P;    Pref.fB=0; %Pref.xZspec=-P.xZspec; %
 plot(P.xZspec,Z_pSL(Pref)-Z_pSL(P),'.-','Color',cl(ii,numel(vary))) ;   hold on;
-% plot(P.xZspec,(P.R1A+P.fC*P.R1C)*(1./Z_cw_2pool(P)-1./Z_cw_2pool(Pref)),'g.-') ;   hold on;
 
 end;
 set(gca,'XDir','reverse'); xlabel('\Delta\omega [ppm]'); ylabel('Z(\Delta\omega)');
